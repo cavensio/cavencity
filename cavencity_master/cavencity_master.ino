@@ -62,7 +62,7 @@ void setupControls() {
 void setup() {
   Serial.begin(115200);
   while (!Serial);
-  Serial.println("cavencity-master");
+  Serial.println("cavencity_master");
   setupControls();
   setupRadio();
 }
