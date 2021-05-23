@@ -16,7 +16,3 @@ pyinstaller --icon=cavencity.ico --add-data="cavencity.ico;." --add-data="cavenc
 Possible addition`al options
 - `--onefile`
 - `--noconsole`
-
-## Dev links
-
-- [pyserial](https://pythonhosted.org/pyserial/)
