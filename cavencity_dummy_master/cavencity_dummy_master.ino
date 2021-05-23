@@ -1,6 +1,13 @@
 /**
    Dummy master emulates cavencity serial protocol for dev and debug purposes.
    It can be uploaded to a bare Arduino without any pins or modules connected.
+   
+   Serial commands:
+   - C - switch to continuous mode and print state every second
+   - P <state string> - push state
+   - R - read state
+   - S - switch continuous mode off
+   - T <time> - sleep for a given amount of millis to simulate timeouts
 */
 
 const char MASTER_UPTIME[] = "mu";
@@ -136,17 +143,21 @@ void readCommand() {
   if (Serial.available()) {
     int command = Serial.read();
     switch (command) {
+      case 'C':
+        continuousMode = true;
+        break;
       case 'P':
         readPushState();
         break;
-      case 'C':
-        continuousMode = true;
+      case 'R':
+        printState();
         break;
       case 'S':
         continuousMode = false;
         break;
-      case 'R':
-        printState();
+      case 'T':
+        int timeout = Serial.parseInt();
+        delay(timeout);
         break;
       case ' ':
       case '\n':

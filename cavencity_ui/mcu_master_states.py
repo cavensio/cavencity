@@ -1,10 +1,15 @@
 """
-Input (requested) and output (actual) states of the MCUs network.
-It represents the aggregated state of all units in the network.
+Input (requested) and output (actual) states of the master MCU.
+It represents combined state of the master itself and its slaves.
 """
 
 
-class OutputState:
+class MasterException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class MasterOutputState:
     def __init__(self):
         self.master_uptime: int = 0
         self.master_counter: int = 0
@@ -21,8 +26,8 @@ class OutputState:
         self.slave2_light_intensity: int = 0
 
     @staticmethod
-    def from_mcu_string(mcu_string) -> 'OutputState':
-        state = OutputState()
+    def from_mcu_string(mcu_string) -> 'MasterOutputState':
+        state = MasterOutputState()
         data = {k: int(v) for k, v in [i.split('=') for i in mcu_string.split(' ')]}
         state.master_uptime = data['mu']
         state.master_counter = data['mc']
@@ -40,7 +45,7 @@ class OutputState:
         return state
 
 
-class InputState:
+class MasterInputState:
     def __init__(self, master_light_intensity: int,
                  slave1_fan_speed: int, slave1_light_intensity: int,
                  slave2_fan_speed: int, slave2_light_intensity: int
