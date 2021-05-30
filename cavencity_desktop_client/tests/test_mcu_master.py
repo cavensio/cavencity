@@ -15,11 +15,11 @@ class TestMcuMaster(unittest.TestCase):
     def test_read_state_fail(self):
         mcu = McuMaster('NOT_A_PORT')
         with self.assertRaises(MasterException):
-            mcu.read_state()
+            mcu.get_state()
 
     def test_read_state(self):
         mcu = McuMaster(MASTER_PORT)
-        state = mcu.read_state()
+        state = mcu.get_state()
         self.assertGreater(state.master_uptime, 0)
         self.assertGreater(state.master_counter, 0)
         self.assertGreater(state.slave1_uptime, 0)
@@ -31,4 +31,4 @@ class TestMcuMaster(unittest.TestCase):
         mcu = McuMaster(MASTER_PORT)
         mcu.serial_write(b'T1500')
         with self.assertRaises(MasterException):
-            mcu.read_state()
+            mcu.get_state()

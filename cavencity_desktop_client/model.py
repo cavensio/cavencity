@@ -1,10 +1,10 @@
 import configparser as configparser
 
+from logger import log
 from serial.tools.list_ports_common import ListPortInfo
 
-from core import Core
-
-core = Core()
+from mcu_master import McuMaster
+from mcu_master_states import MasterOutputState, MasterInputState
 
 
 class Model:
@@ -13,7 +13,12 @@ class Model:
     def __init__(self):
         super().__init__()
         self.__load_config()
-        self._master_port = self.config.get('Master', 'port')
+        self.master_input_state = MasterInputState()
+        self.master_output_state = MasterOutputState()
+        self._master = McuMaster()
+
+    def load(self):
+        self._master.port = self.config.get('Master', 'port')
 
     def __load_config(self):
         config = configparser.ConfigParser(allow_no_value=True)
@@ -25,12 +30,12 @@ class Model:
 
     @property
     def master_port(self):
-        return self._master_port
+        return self._master.port
 
     @master_port.setter
     def master_port(self, port):
-        print(f'Set master port: {port}')
-        self._master_port = port
+        log.info(f'Set master port: {port}')
+        self._master.port = port
         self.config.set('Master', 'port', value=port)
         self.__save_config()
 
@@ -43,4 +48,8 @@ class Model:
         return self.config.get('Slave2', 'alias', fallback='Slave2')
 
     def list_ports(self) -> list[ListPortInfo]:
-        return core.list_ports()
+        return self._master.list_ports()
+
+    def tick(self):
+         self.master_output_state = self._master.set_state(self.master_input_state)
+        # self.master_output_state = self._master.read_state()

@@ -1,9 +1,8 @@
 """
 Serial interface to the master MCU.
 """
-import time
 from time import sleep
-from log import log
+from logger import log
 from serial import Serial, SerialException
 from serial.tools import list_ports
 
@@ -19,13 +18,16 @@ class McuMaster:
         self._port = port
         self._serial: Serial = None
 
-    def push_state(self, input_state: MasterInputState) -> MasterOutputState:
+    def set_state(self, input_state: MasterInputState) -> MasterOutputState:
         request = input_state.to_mcu_string().encode('ascii')
-        self.serial_write(b'P' + request)
-        return self.read_state()
+        self.serial_write(b'S ' + request + b'\n')
+        return self.__read_state()
 
-    def read_state(self) -> MasterOutputState:
-        self.serial_write(b'R')
+    def get_state(self) -> MasterOutputState:
+        self.serial_write(b'P\n')
+        return self.__read_state()
+
+    def __read_state(self) -> MasterOutputState:
         while True:
             line = self.serial_readline()
             if not line:
@@ -46,6 +48,7 @@ class McuMaster:
 
         if closed:
             self.serial_open()
+            sleep(1)
             self.__read_welcome()
 
     def __read_welcome(self):
@@ -78,7 +81,7 @@ class McuMaster:
     def serial_write(self, data: bytes) -> None:
         self.__check_or_open_serial()
         try:
-            log.warning(f'Master write: {data}')
+            log.info(f'Master write: {data}')
             self._serial.write(data)
         except SerialException as e:
             raise MasterException('Can write to the master') from e
