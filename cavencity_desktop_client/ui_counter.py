@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QLCDNumber
 
 
-class CvCounter(QLCDNumber):
+class CaveCounter(QLCDNumber):
     def __init__(self):
         super().__init__()
         self._online: bool = None

@@ -35,7 +35,6 @@ void setupRadio() {
   radio.enableDynamicPayloads();
   radio.enableAckPayload();
   radio.openReadingPipe(1, RADIO_ADDRESS[0]);
-  radio.openWritingPipe(RADIO_ADDRESS[1]); //todo change
   radio.stopListening();
 }
 
@@ -58,6 +57,10 @@ void setup() {
 }
 
 void setSlaveState(uint8_t slaveIndex) {
+  radio.stopListening();
+  radio.openWritingPipe(RADIO_ADDRESS[slaveIndex + 1]);
+  delay(1);
+  
   SlaveTargetState &slaveTargetState = targetState.slaveStates[slaveIndex];
   SlaveActualState &slaveActualState = actualState.slaveStates[slaveIndex];
   NetStat &slaveNetStat = actualState.slaveStats[slaveIndex];
@@ -91,7 +94,7 @@ void setSlaveState(uint8_t slaveIndex) {
       Serial.print(" ");
       Serial.println(slaveActualState.damperClosed);
     } else {
-      Serial.println(" Response fail: lat=");
+      Serial.print(" Response fail: lat=");
       Serial.println(time);
       slaveNetStat.online = 0;
       slaveNetStat.errors++;
@@ -122,6 +125,7 @@ void readCommand() {
         updateMasterVariables();
         serialParseTargetState(targetState);
         setSlaveState(0);
+        setSlaveState(1);
         serialPrintActualState(actualState);
         break;
       case ' ':
@@ -148,5 +152,17 @@ void loop() {
     }
   } else {
     digitalWrite(CAVE1_LED_PIN, LOW);
+  }
+  
+  if (actualState.slaveStats[1].online) {
+    if (actualState.slaveStates[1].fanLevel == 0) {
+      digitalWrite(CAVE2_LED_PIN, HIGH);
+    } else {
+      digitalWrite(CAVE2_LED_PIN, LOW);
+      delay(250);
+      digitalWrite(CAVE2_LED_PIN, HIGH);
+    }
+  } else {
+    digitalWrite(CAVE2_LED_PIN, LOW);
   }
 }

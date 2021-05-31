@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QProgressBar, QSlider, QVBoxLayout, QLabel, QFrame
 
 
-class CvSlider(QWidget):
+class CaveSlider(QWidget):
     valueChanged = pyqtSignal(int)
 
     def __init__(self, label: str, max_value: int = 5):

@@ -12,8 +12,8 @@ from ui_slider import CaveSlider
 from ui_utils import format_uptime
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
+class CaveSlave(QGroupBox):
+    def __init__(self, alias: str):
         super().__init__()
         self._model = Model()
         self.setWindowTitle('Cavencity')
@@ -26,13 +26,7 @@ class MainWindow(QMainWindow):
         self.__create_status_bar()
         self.__misc()
 
-        try:
-            self._model.load()
-            if self._model.master_port:
-                self.__update_master_port_label()
-            self.__start_thread()
-        except MasterException as e:
-            QMessageBox.warning(self, 'Master controller offline', e.message, buttons=QMessageBox.Ok)
+
 
     def __create_com_port_menu(self):
         self.com_port_menu = QMenu('&Master port', self)

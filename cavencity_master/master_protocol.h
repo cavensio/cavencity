@@ -78,6 +78,7 @@ void serialPrintActualState(MasterSlaveActualState const &state) {
   printKeyValue(SLAVE2_ONLINE_TAG, state.slaveStats[1].online);
   printKeyValue(SLAVE2_LATENCY_TAG, state.slaveStats[1].latency);
   printKeyValue(SLAVE2_ERRORS_TAG, state.slaveStats[1].errors);
+  
   printKeyValue(SLAVE2_UPTIME_TAG, state.slaveStates[1].uptime);
   printKeyValue(SLAVE2_COUNTER_TAG, state.slaveStates[1].counter);
   printKeyValue(SLAVE2_FAN_LEVEL_TAG, state.slaveStates[1].fanLevel);
