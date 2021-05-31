@@ -9,56 +9,12 @@
    - P - print state string
    - T <time> - sleep for a given amount of millis to simulate timeout
 */
+#include "slave_protocol.h"
+#include "master_protocol.h"
 
-const char MASTER_UPTIME[] = "mu";
-const char MASTER_COUNTER[] = "mc";
-const char MASTER_BACKLIGHT[] = "mb";
-
-const char SLAVE1_ONLINE[] = "s1o";
-const char SLAVE1_UPTIME[] = "s1u";
-const char SLAVE1_COUNTER[] = "s1c";
-
-const char SLAVE1_FAN[] = "s1fl";
-const char SLAVE1_LIGHT[] = "s1ll";
-const char SLAVE1_DAMPER[] = "s1d";
-
-const char SLAVE2_ONLINE[] = "s2o";
-const char SLAVE2_UPTIME[] = "s2u";
-const char SLAVE2_COUNTER[] = "s2c";
-
-const char SLAVE2_FAN[] = "s2fl";
-const char SLAVE2_LIGHT[] = "s2ll";
-const char SLAVE2_DAMPER[] = "s2d";
-
-
-
-uint32_t masterUptime = 0;
-uint32_t masterCounter = 0;
-uint8_t slave1Online = 0;
-uint32_t slave1Uptime = 0;
-uint32_t slave1Counter = 0;
-uint8_t slave2Online = 0;
-uint32_t slave2Uptime = 0;
-uint32_t slave2Counter = 0;
-
-// Target values
-uint8_t masterBacklight = 0;
-uint8_t slave1Fan = 0;
-uint8_t slave1Damper = 0;
-uint8_t slave1Light = 0;
-uint8_t slave2Fan = 0;
-uint8_t slave2Damper = 0;
-uint8_t slave2Light = 0;
-
-// Actual values
-uint8_t masterBacklightActual = 0;
-uint8_t slave1FanActual = 0;
-uint8_t slave1DamperActual = 0;
-uint8_t slave1LightActual = 0;
-uint8_t slave2FanActual = 0;
-uint8_t slave2DamperActual = 0;
-uint8_t slave2LightActual = 0;
-
+// States
+MasterSlaveActualState actualState;
+MasterSlaveTargetState targetState;
 
 bool continuousMode = false;
 
@@ -69,117 +25,54 @@ void setup() {
   Serial.println("cavencity_dummy_master");
 }
 
-void printDataItem(char* key, uint32_t value) {
-  Serial.print(key);
-  Serial.print('=');
-  Serial.print(value);
-  Serial.print(' ');
-}
-
-void printState() {
-  setVariables();
-  Serial.print('\x1e');
-  printDataItem(MASTER_UPTIME, masterUptime);
-  printDataItem(MASTER_COUNTER, masterCounter);
-  printDataItem(MASTER_BACKLIGHT, masterBacklightActual);
-  printDataItem(SLAVE1_ONLINE, slave1Online);
-  printDataItem(SLAVE1_UPTIME, slave1Uptime);
-  printDataItem(SLAVE1_COUNTER, slave1Counter);
-  printDataItem(SLAVE1_FAN, slave1FanActual);
-  printDataItem(SLAVE1_DAMPER, slave1DamperActual);
-  printDataItem(SLAVE1_LIGHT, slave1LightActual);
-  printDataItem(SLAVE2_ONLINE, slave2Online);
-  printDataItem(SLAVE2_UPTIME, slave2Uptime);
-  printDataItem(SLAVE2_COUNTER, slave2Counter);
-  printDataItem(SLAVE2_FAN, slave2FanActual);
-  printDataItem(SLAVE2_DAMPER, slave2DamperActual);
-  printDataItem(SLAVE2_LIGHT, slave2LightActual);
-  Serial.println();
-}
-
-uint8_t justifyVariable(uint8_t targetValue, uint8_t actualValue) {
-  if (targetValue > actualValue) {
-    return ++actualValue;
-  } else if (targetValue < actualValue) {
-    return --actualValue;
+uint8_t justifyVariable(uint8_t targetValue, uint8_t actualValue, uint8_t step = 1) {
+  int8_t diff = targetValue - actualValue;
+  if (diff > 0) {
+    return actualValue += min(diff, step);
+  } else if (diff < 0) {
+    return actualValue -= min(-diff, step);
   } else {
     return actualValue;
   }
 }
 
-void setVariables() {
-  masterUptime = millis();
+void calcVariables() {
+  actualState.masterState.uptime = millis() / 1000;
+  actualState.masterState.counter++;
+  actualState.masterState.backlight = justifyVariable(targetState.masterState.backlight, actualState.masterState.backlight);
 
-  masterCounter += 1;
-  masterBacklightActual = justifyVariable(masterBacklight, masterBacklightActual);
+  if (actualState.masterState.counter % 15 > 0 && actualState.masterState.counter % 15 < 10) {
+    actualState.slaveStats[0].online = 1;
+    actualState.slaveStats[0].latency = random(500, 1500);
 
-  if (masterCounter % 15 > 0 && masterCounter % 15 < 10) {
-    slave1Online = 1;
-    slave1Counter++;
-    slave1Uptime = masterUptime + 1234;
-    slave1FanActual = justifyVariable(slave1Fan, slave1FanActual);
-    slave1DamperActual = justifyVariable(slave1Damper, slave1DamperActual);
-    slave1LightActual = justifyVariable(slave1Light, slave1LightActual);
+    actualState.slaveStates[0].counter++;
+    actualState.slaveStates[0].uptime = actualState.masterState.uptime + 1234;
+
+    actualState.slaveStates[0].fanLevel = justifyVariable(targetState.slaveStates[0].fanLevel,
+                                          actualState.slaveStates[0].fanLevel);
+    actualState.slaveStates[0].lightLevel = justifyVariable(targetState.slaveStates[0].lightLevel,
+                                            actualState.slaveStates[0].lightLevel, 5);
+    actualState.slaveStates[0].damperClosed = justifyVariable(targetState.slaveStates[0].damperClosed,
+        actualState.slaveStates[0].damperClosed);
   } else {
-    slave1Online = 0;
+    actualState.slaveStats[0].online = 0;
   }
 
-  if (masterCounter % 25 > 3 && masterCounter % 25 < 17 ) {
-    slave2Online = 1;
-    slave2Counter++;
-    slave2Uptime = masterUptime + 56789;
-    slave2FanActual = justifyVariable(slave2Fan, slave2FanActual);
-    slave2DamperActual = justifyVariable(slave2Damper, slave2DamperActual);
-    slave2LightActual = justifyVariable(slave2Light, slave2LightActual);
+  if (actualState.masterState.counter % 25 > 3 && actualState.masterState.counter % 25 < 17 ) {
+    actualState.slaveStats[1].online = 1;
+    actualState.slaveStats[1].latency = random(500, 1500);
+
+    actualState.slaveStates[1].counter++;
+    actualState.slaveStates[1].uptime = actualState.masterState.uptime + 56789;
+
+    actualState.slaveStates[1].fanLevel = justifyVariable(targetState.slaveStates[1].fanLevel,
+                                          actualState.slaveStates[1].fanLevel);
+    actualState.slaveStates[1].lightLevel = justifyVariable(targetState.slaveStates[1].lightLevel,
+                                            actualState.slaveStates[1].lightLevel, 5);
+    actualState.slaveStates[1].damperClosed = justifyVariable(targetState.slaveStates[1].damperClosed,
+        actualState.slaveStates[1].damperClosed);
   } else {
-    slave2Online = 0;
-  }
-}
-
-void setState() {
-  while (true) {
-    int next = Serial.peek();
-    if (next == -1) {
-      continue;
-    }
-    if (next == '\n') {
-      break;
-    }
-
-    String key = Serial.readStringUntil('=');
-    key.trim();
-    if (!key) {
-      break;
-    }
-    int val = Serial.parseInt(SKIP_WHITESPACE);
-
-//    Serial.print(key);
-//    Serial.print('=');
-//    Serial.print(val);
-
-    if (val > 255) {
-      Serial.println(" Invalid value");
-      continue;
-    }
-    if (key == MASTER_BACKLIGHT) {
-      masterBacklight = val;
-    } else if (key == SLAVE1_FAN) {
-      slave1Fan = val;
-    } else if (key == SLAVE2_FAN) {
-      slave2Fan = val;
-    } else if (key == SLAVE1_DAMPER) {
-      slave1Damper = val;
-    } else if (key == SLAVE2_DAMPER) {
-      slave2Damper = val;
-    } else if (key == SLAVE1_LIGHT) {
-      slave1Light = val;
-    } else if (key == SLAVE2_LIGHT) {
-      slave2Light = val;
-    } else {
-      Serial.println(" Unknown key");
-      continue;
-    }
-//    Serial.println();
+    actualState.slaveStats[1].online = 0;
   }
 }
 
@@ -194,14 +87,16 @@ void readCommand() {
         continuousMode = false;
         break;
       case 'P':
-        printState();
+        calcVariables();
+        serialPrintActualState(actualState);
         break;
       case 'S':
-        setState();
+        serialParseTargetState(targetState);
+        calcVariables();
+        serialPrintActualState(actualState);
         break;
       case 'T':
-        int timeout = Serial.parseInt();
-        delay(timeout);
+        delay(Serial.parseInt());
         break;
       case ' ':
       case '\n':
@@ -224,7 +119,8 @@ void loop() {
   readCommand();
 
   if (continuousMode) {
-    printState();
+    calcVariables();
+    serialPrintActualState(actualState);
     waitForSerialOrTimeout(1000);
   }
 }

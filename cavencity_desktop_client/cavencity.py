@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from ui_main import MainWindow
+from CaveUi import CaveMainWindow
 
 old_excepthook = sys.excepthook
 
@@ -25,7 +25,7 @@ app = QApplication(sys.argv)
 with open('cavencio.qss') as f:
     app.setStyleSheet(f.read())
 
-window = MainWindow()
+window = CaveMainWindow()
 window.show()
 
 app.exec()

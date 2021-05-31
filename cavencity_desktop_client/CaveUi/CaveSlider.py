@@ -11,8 +11,8 @@ class CaveSlider(QWidget):
         self._actual_value: int = 0
 
         slider = QSlider()
-        slider.setSingleStep(1)
-        slider.setPageStep(1)
+        # slider.setSingleStep(1)
+        # slider.setPageStep(1)
         slider.setMaximum(max_value)
         slider.setTickInterval(1)
         slider.setTickPosition(QSlider.TicksBothSides)

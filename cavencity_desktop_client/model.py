@@ -4,7 +4,7 @@ from logger import log
 from serial.tools.list_ports_common import ListPortInfo
 
 from mcu_master import McuMaster
-from mcu_master_states import MasterOutputState, MasterInputState
+from mcu_master_states import MasterSlaveTargetState, MasterSlaveActualState
 
 
 class Model:
@@ -13,8 +13,8 @@ class Model:
     def __init__(self):
         super().__init__()
         self.__load_config()
-        self.master_input_state = MasterInputState()
-        self.master_output_state = MasterOutputState()
+        self.target_state = MasterSlaveTargetState()
+        self.actual_state = MasterSlaveActualState()
         self._master = McuMaster()
 
     def load(self):
@@ -51,5 +51,4 @@ class Model:
         return self._master.list_ports()
 
     def tick(self):
-         self.master_output_state = self._master.set_state(self.master_input_state)
-        # self.master_output_state = self._master.read_state()
+        self.actual_state = self._master.set_state(self.target_state)

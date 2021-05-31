@@ -1,10 +1,16 @@
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QFormLayout, QGroupBox, QCheckBox, QVBoxLayout
 
-from ui_counter import CaveCounter
-from ui_slider import CaveSlider
+from mcu_master_states import SlaveActualState
+from CaveUi.CaveCounter import CaveCounter
+from CaveUi.CaveSlider import CaveSlider
+from CaveUi.ui_utils import format_uptime
 
 
 class CaveSlave(QGroupBox):
+    fanLevelChanged = pyqtSignal(int)
+    lightLevelChanged = pyqtSignal(int)
+
     def __init__(self, alias: str):
         super().__init__(alias)
 
@@ -16,9 +22,10 @@ class CaveSlave(QGroupBox):
         self.damper_checkbox = QCheckBox()
 
         self.fan_slider = CaveSlider('Fan speed')
-        # fan_slider.valueChanged.connect(self.__on_slave1_fan_level_changed)
+        self.fan_slider.valueChanged.connect(self.fanLevelChanged)
+
         self.light_slider = CaveSlider('Light', max_value=100)
-        # light_slider.valueChanged.connect(self.__on_slave1_light_changed)
+        self.light_slider.valueChanged.connect(self.lightLevelChanged)
 
         form = QFormLayout()
         form.addRow(QLabel('State:'), self.state_label)
@@ -39,5 +46,16 @@ class CaveSlave(QGroupBox):
         vbox.addStretch(1)
         self.setLayout(vbox)
 
-        def updateState(self):
-            pass
+    def updateState(self, actual_state: SlaveActualState):
+        self.latency_label.setText(f'{actual_state.latency}μs')
+        self.errors_label.setText(f'{actual_state.errors}')
+        self.count_lcdnumber.setValue(actual_state.counter, actual_state.online)
+
+        self.fan_slider.setActualValue(actual_state.fan_level)
+        self.light_slider.setActualValue(actual_state.light_level)
+
+        if actual_state.online:
+            self.state_label.setText('Online')
+            self.uptime_label.setText(format_uptime(actual_state.uptime))
+        else:
+            self.state_label.setText('Offline')
