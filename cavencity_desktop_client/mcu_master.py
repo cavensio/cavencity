@@ -6,7 +6,7 @@ from logger import log
 from serial import Serial, SerialException
 from serial.tools import list_ports
 
-from mcu_master_states import MasterOutputState, MasterInputState, MasterException
+from mcu_master_states import MasterException, MasterSlaveTargetState, MasterSlaveActualState
 
 
 class McuMaster:
@@ -18,16 +18,16 @@ class McuMaster:
         self._port = port
         self._serial: Serial = None
 
-    def set_state(self, input_state: MasterInputState) -> MasterOutputState:
+    def set_state(self, input_state: MasterSlaveTargetState) -> MasterSlaveActualState:
         request = input_state.to_mcu_string().encode('ascii')
         self.serial_write(b'S ' + request + b'\n')
         return self.__read_state()
 
-    def get_state(self) -> MasterOutputState:
+    def get_state(self) -> MasterSlaveActualState:
         self.serial_write(b'P\n')
         return self.__read_state()
 
-    def __read_state(self) -> MasterOutputState:
+    def __read_state(self) -> MasterSlaveActualState:
         while True:
             line = self.serial_readline()
             if not line:
@@ -35,7 +35,7 @@ class McuMaster:
                 log.warning(msg)
                 raise MasterException(msg)
             elif line[0] == 0x1e:
-                return MasterOutputState.from_mcu_string(line[1:].strip().decode('ascii'))
+                return MasterSlaveActualState.from_mcu_string(line[1:].strip().decode('ascii'))
 
     def __check_or_open_serial(self, force_reopen=False):
         closed = True

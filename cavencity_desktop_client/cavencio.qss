@@ -1,15 +1,15 @@
-CvCounter {
+CaveCounter {
   background-color: #202020;
   border: 1px solid #808080;
   border-radius: 5px;
   color: #FFBF00;
 }
 
-CvCounter[online=false] {
+CaveCounter[online=false] {
   color: #FF0000;
 }
 
-CvCounter[online=true] {
+CaveCounter[online=true] {
   color: #00FF00;
 }
 
