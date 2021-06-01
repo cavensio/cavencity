@@ -46,13 +46,13 @@ class CaveSlave(QGroupBox):
         vbox.addStretch(1)
         self.setLayout(vbox)
 
-    def updateState(self, actual_state: SlaveActualState):
+    def update_date(self, actual_state: SlaveActualState):
         self._latency_label.setText(format_micros(actual_state.latency))
         self._errors_label.setText(f'{actual_state.errors}')
-        self._count_lcdnumber.setValue(actual_state.counter, actual_state.online)
+        self._count_lcdnumber.set_value(actual_state.counter, actual_state.online)
 
-        self._fan_slider.setActualValue(actual_state.fan_level)
-        self._light_slider.setActualValue(actual_state.light_level)
+        self._fan_slider.set_actual_value(actual_state.fan_level)
+        self._light_slider.set_actual_value(actual_state.light_level)
 
         if actual_state.online:
             self._state_label.setText('Online')

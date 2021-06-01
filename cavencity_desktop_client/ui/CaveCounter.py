@@ -11,7 +11,7 @@ class CaveCounter(QLCDNumber):
         self.setFrameStyle(QLCDNumber.Flat)
         self.setSegmentStyle(QLCDNumber.Flat)
 
-    def setValue(self, value, online: bool = True) -> None:
+    def set_value(self, value, online: bool = True) -> None:
         if value != self._value:
             self._value = value
             super().display(value)

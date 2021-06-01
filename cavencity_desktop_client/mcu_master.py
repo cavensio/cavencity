@@ -93,10 +93,8 @@ class McuMaster:
     def _serial_readline(self) -> bytes:
         self._check_or_open_serial()
         try:
-            time1 = time.time_ns()
             data = self._serial.readline()
-            time2 = time.time_ns()
-            log.info(f'{(time2 - time1) // 1000} Master read: {data}')
+            log.info(f'Master read: {data}')
             return data
         except SerialException as e:
             raise MasterException('Can read from the master') from e

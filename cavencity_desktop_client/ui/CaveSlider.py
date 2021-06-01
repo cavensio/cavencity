@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QProgressBar, QSlider, QVBoxLayout, QLabel, QFrame
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QProgressBar, QSlider, QVBoxLayout, QLabel
 
 
 class CaveSlider(QWidget):
@@ -41,6 +41,6 @@ class CaveSlider(QWidget):
 
         self.setLayout(vbox)
 
-    def setActualValue(self, value) -> None:
+    def set_actual_value(self, value) -> None:
         if value != self._actual_value:
             self._status.setValue(value)

@@ -117,6 +117,6 @@ class CaveMainWindow(QMainWindow):
 
     def _thread_tick(self):
         self._model.tick()
-        self.cave_master.updateState(self._model.actual_state.masterState)
-        self.cave_slave1.updateState(self._model.actual_state.slaveStates[0])
-        self.cave_slave2.updateState(self._model.actual_state.slaveStates[1])
+        self.cave_master.update_state(self._model.actual_state.masterState)
+        self.cave_slave1.update_date(self._model.actual_state.slaveStates[0])
+        self.cave_slave2.update_date(self._model.actual_state.slaveStates[1])

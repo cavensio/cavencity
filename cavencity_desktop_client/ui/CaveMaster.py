@@ -27,7 +27,7 @@ class CaveMaster(QGroupBox):
 
         self.setLayout(form)
 
-    def updateState(self, actual_state: MasterActualState):
+    def update_state(self, actual_state: MasterActualState):
         self._uptime_label.setText(format_uptime(actual_state.uptime))
-        self._count_lcdnumber.setValue(actual_state.counter)
+        self._count_lcdnumber.set_value(actual_state.counter)
         self._latency_label.setText(format_micros(actual_state.latency))

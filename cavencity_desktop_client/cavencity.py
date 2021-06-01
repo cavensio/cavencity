@@ -11,13 +11,13 @@ def exception_hook(exctype, value, traceback):
     old_excepthook(exctype, value, traceback)
     sys.exit(1)
 
+
 sys.excepthook = exception_hook
 
 try:
     from PyQt5.QtWinExtras import QtWin
 
-    app_id = 'cavensio.cavencity'
-    QtWin.setCurrentProcessExplicitAppUserModelID(app_id)
+    QtWin().setCurrentProcessExplicitAppUserModelID(id='cavensio.cavencity')
 except ImportError:
     pass
 

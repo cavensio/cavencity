@@ -20,12 +20,12 @@ class TestMcuMaster(unittest.TestCase):
     def test_read_state(self):
         mcu = McuMaster(MASTER_PORT)
         state = mcu.get_state()
-        self.assertGreater(state.master_uptime, 0)
-        self.assertGreater(state.master_counter, 0)
-        self.assertGreater(state.slave1_uptime, 0)
-        self.assertGreater(state.slave1_counter, 0)
-        self.assertGreater(state.slave2_uptime, 0)
-        self.assertGreater(state.slave2_counter, 0)
+        self.assertEqual(state.masterState.uptime, 0)
+        self.assertGreater(state.masterState.counter, 0)
+        self.assertGreater(state.slaveStates[0].uptime, 0)
+        self.assertGreater(state.slaveStates[0].counter, 0)
+        self.assertEqual(state.slaveStates[1].uptime, 0)
+        self.assertEqual(state.slaveStates[1].counter, 0)
 
     def test_timeout(self):
         mcu = McuMaster(MASTER_PORT)
