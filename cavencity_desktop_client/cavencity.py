@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from CaveUi import CaveMainWindow
+from ui import CaveMainWindow
 
 old_excepthook = sys.excepthook
 
