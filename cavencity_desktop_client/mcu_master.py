@@ -1,7 +1,7 @@
 """
 Serial interface to the master MCU.
 """
-from time import sleep
+import time
 from logger import log
 from serial import Serial, SerialException
 from serial.tools import list_ports
@@ -20,16 +20,20 @@ class McuMaster:
 
     def set_state(self, input_state: MasterSlaveTargetState) -> MasterSlaveActualState:
         request = input_state.to_mcu_string().encode('ascii')
-        self.serial_write(b'S ' + request + b'\n')
-        return self.__read_state()
+        time1 = time.time()
+        self._serial_write(b'S ' + request + b'\n')
+        state: MasterSlaveActualState = self._read_state()
+        time2 = time.time()
+        state.masterState.latency = int((time2 - time1) * 1000000)
+        return state
 
     def get_state(self) -> MasterSlaveActualState:
-        self.serial_write(b'P\n')
-        return self.__read_state()
+        self._serial_write(b'P\n')
+        return self._read_state()
 
-    def __read_state(self) -> MasterSlaveActualState:
+    def _read_state(self) -> MasterSlaveActualState:
         while True:
-            line = self.serial_readline()
+            line = self._serial_readline()
             if not line:
                 msg = 'No response from the master'
                 log.warning(msg)
@@ -37,7 +41,7 @@ class McuMaster:
             elif line[0] == 0x1e:
                 return MasterSlaveActualState.from_mcu_string(line[1:].strip().decode('ascii'))
 
-    def __check_or_open_serial(self, force_reopen=False):
+    def _check_or_open_serial(self, force_reopen=False):
         closed = True
         if self._serial and self._serial.isOpen():
             if force_reopen:
@@ -47,14 +51,14 @@ class McuMaster:
                 closed = False
 
         if closed:
-            self.serial_open()
-            sleep(1)
-            self.__read_welcome()
+            self._serial_open()
+            time.sleep(1)
+            self._read_welcome()
 
-    def __read_welcome(self):
+    def _read_welcome(self):
         # MCU need some time to boot
         while True:
-            data = self.serial_readline()
+            data = self._serial_readline()
             if not data:
                 continue
             elif data == b'cavencity_dummy_master\r\n':
@@ -68,7 +72,7 @@ class McuMaster:
                 log.warning(msg)
                 raise MasterException(msg)
 
-    def serial_open(self) -> None:
+    def _serial_open(self) -> None:
         try:
             log.info(f'Opening master {self._port}')
             self._serial = Serial(port=self._port, baudrate=self.PORT_SPEED, timeout=self.TIMEOUT)
@@ -78,16 +82,16 @@ class McuMaster:
             log.warning(msg)
             raise MasterException(msg) from e
 
-    def serial_write(self, data: bytes) -> None:
-        self.__check_or_open_serial()
+    def _serial_write(self, data: bytes) -> None:
+        self._check_or_open_serial()
         try:
             log.info(f'Master write: {data}')
             self._serial.write(data)
         except SerialException as e:
             raise MasterException('Can write to the master') from e
 
-    def serial_readline(self) -> bytes:
-        self.__check_or_open_serial()
+    def _serial_readline(self) -> bytes:
+        self._check_or_open_serial()
         try:
             data = self._serial.readline()
             log.info(f'Master read: {data}')
@@ -103,7 +107,7 @@ class McuMaster:
     def port(self, port):
         log.info(f'Set master port: {port}')
         self._port = port
-        self.__check_or_open_serial(True)
+        self._check_or_open_serial(True)
 
     def list_ports(self):
         """

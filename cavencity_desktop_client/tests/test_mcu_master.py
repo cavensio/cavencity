@@ -29,6 +29,6 @@ class TestMcuMaster(unittest.TestCase):
 
     def test_timeout(self):
         mcu = McuMaster(MASTER_PORT)
-        mcu.serial_write(b'T1500')
+        mcu._serial_write(b'T1500')
         with self.assertRaises(MasterException):
             mcu.get_state()

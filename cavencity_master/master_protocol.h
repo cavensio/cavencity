@@ -68,7 +68,7 @@ void serialPrintActualState(MasterSlaveActualState const &state) {
   printKeyValue(SLAVE1_ONLINE_TAG, state.slaveStats[0].online);
   printKeyValue(SLAVE1_LATENCY_TAG, state.slaveStats[0].latency);
   printKeyValue(SLAVE1_ERRORS_TAG, state.slaveStats[0].errors);
-  
+
   printKeyValue(SLAVE1_UPTIME_TAG, state.slaveStates[0].uptime);
   printKeyValue(SLAVE1_COUNTER_TAG, state.slaveStates[0].counter);
   printKeyValue(SLAVE1_FAN_LEVEL_TAG, state.slaveStates[0].fanLevel);
@@ -78,7 +78,7 @@ void serialPrintActualState(MasterSlaveActualState const &state) {
   printKeyValue(SLAVE2_ONLINE_TAG, state.slaveStats[1].online);
   printKeyValue(SLAVE2_LATENCY_TAG, state.slaveStats[1].latency);
   printKeyValue(SLAVE2_ERRORS_TAG, state.slaveStats[1].errors);
-  
+
   printKeyValue(SLAVE2_UPTIME_TAG, state.slaveStates[1].uptime);
   printKeyValue(SLAVE2_COUNTER_TAG, state.slaveStates[1].counter);
   printKeyValue(SLAVE2_FAN_LEVEL_TAG, state.slaveStates[1].fanLevel);
@@ -106,12 +106,15 @@ void serialParseTargetState(MasterSlaveTargetState &state) {
     }
     int val = Serial.parseInt(SKIP_WHITESPACE);
 
-    Serial.print(key);
-    Serial.print('=');
-    Serial.print(val);
+    //    Serial.print(key);
+    //    Serial.print('=');
+    //    Serial.print(val);
 
     if (val > 255) {
-      Serial.println(" Invalid value");
+      Serial.print("Invalid value: ");
+      Serial.print(key);
+      Serial.print('=');
+      Serial.println(val);
       continue;
     }
 
@@ -130,7 +133,10 @@ void serialParseTargetState(MasterSlaveTargetState &state) {
     } else if (key == SLAVE2_DAMPER_CLOSED_TAG) {
       state.slaveStates[1].damperClosed  = val;
     } else {
-      Serial.println(" Unknown key");
+      Serial.print("Unknown key: ");
+      Serial.print(key);
+      Serial.print('=');
+      Serial.println(val);
       continue;
     }
     Serial.println();

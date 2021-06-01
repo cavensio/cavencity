@@ -7,3 +7,10 @@ def format_uptime(seconds: int) -> str:
         if seconds >= 86400:
             uptime = f'{int(seconds / 86400)}h {uptime}'
     return uptime
+
+
+def format_micros(micros: int) -> str:
+    if micros > 9999:
+        return f'{int(micros/1000)}ms'
+    else:
+        return f'{micros}μs'

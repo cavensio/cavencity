@@ -39,25 +39,25 @@ class MasterSlaveActualState:
     def from_mcu_string(mcu_string) -> 'MasterSlaveActualState':
         state = MasterSlaveActualState()
         data = {k: int(v) for k, v in [i.split('=') for i in mcu_string.split(' ')]}
-        state.masterState.uptime = data['mu']
-        state.masterState.counter = data['mc']
-        state.masterState.backlight = data['mbl']
+        state.masterState.uptime = data.get('mu', 0)
+        state.masterState.counter = data.get('mc', 0)
+        state.masterState.backlight = data.get('mbl', 0)
 
-        state.slaveStates[0].online = bool(data['s1o'])
-        state.slaveStates[0].uptime = data['s1u']
-        state.slaveStates[0].counter = data['s1c']
-        state.slaveStates[0].latency = data['s1l']
-        state.slaveStates[0].errors = data['s1e']
-        state.slaveStates[0].fan_level = data['s1fl']
-        state.slaveStates[0].light_level = data['s1ll']
+        state.slaveStates[0].online = bool(data.get('s1o', 0))
+        state.slaveStates[0].uptime = data.get('s1u', 0)
+        state.slaveStates[0].counter = data.get('s1c', 0)
+        state.slaveStates[0].latency = data.get('s1l', 0)
+        state.slaveStates[0].errors = data.get('s1e', 0)
+        state.slaveStates[0].fan_level = data.get('s1fl', 0)
+        state.slaveStates[0].light_level = data.get('s1ll', 0)
 
-        state.slaveStates[1].online = bool(data['s2o'])
-        state.slaveStates[1].uptime = data['s2u']
-        state.slaveStates[1].counter = data['s2c']
-        state.slaveStates[1].latency = data['s2l']
-        state.slaveStates[1].errors = data['s2e']
-        state.slaveStates[1].fan_level = data['s2fl']
-        state.slaveStates[1].light_level = data['s2ll']
+        state.slaveStates[1].online = bool(data.get('s2o', 0))
+        state.slaveStates[1].uptime = data.get('s2u', 0)
+        state.slaveStates[1].counter = data.get('s2c', 0)
+        state.slaveStates[1].latency = data.get('s2l', 0)
+        state.slaveStates[1].errors = data.get('s2e', 0)
+        state.slaveStates[1].fan_level = data.get('s2fl', 0)
+        state.slaveStates[1].light_level = data.get('s2ll', 0)
         return state
 
 

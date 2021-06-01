@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QFormLayout, QGroupBox, QCheckB
 from mcu_master_states import SlaveActualState
 from ui.CaveCounter import CaveCounter
 from ui.CaveSlider import CaveSlider
-from ui.ui_utils import format_uptime
+from ui.ui_utils import format_uptime, format_micros
 
 
 class CaveSlave(QGroupBox):
@@ -47,7 +47,7 @@ class CaveSlave(QGroupBox):
         self.setLayout(vbox)
 
     def updateState(self, actual_state: SlaveActualState):
-        self._latency_label.setText(f'{actual_state.latency}μs')
+        self._latency_label.setText(format_micros(actual_state.latency))
         self._errors_label.setText(f'{actual_state.errors}')
         self._count_lcdnumber.setValue(actual_state.counter, actual_state.online)
 
