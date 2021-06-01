@@ -11,7 +11,7 @@ from mcu_master_states import MasterException, MasterSlaveTargetState, MasterSla
 
 class McuMaster:
     PORT_SPEED = 115200
-    TIMEOUT = 1
+    TIMEOUT = 100
 
     def __init__(self, port: str = None):
         super().__init__()
@@ -20,11 +20,11 @@ class McuMaster:
 
     def set_state(self, input_state: MasterSlaveTargetState) -> MasterSlaveActualState:
         request = input_state.to_mcu_string().encode('ascii')
-        time1 = time.time()
+        time1 = time.time_ns()
         self._serial_write(b'S ' + request + b'\n')
         state: MasterSlaveActualState = self._read_state()
-        time2 = time.time()
-        state.masterState.latency = int((time2 - time1) * 1000000)
+        time2 = time.time_ns()
+        state.masterState.latency = (time2 - time1) // 1000
         return state
 
     def get_state(self) -> MasterSlaveActualState:
@@ -93,8 +93,10 @@ class McuMaster:
     def _serial_readline(self) -> bytes:
         self._check_or_open_serial()
         try:
+            time1 = time.time_ns()
             data = self._serial.readline()
-            log.info(f'Master read: {data}')
+            time2 = time.time_ns()
+            log.info(f'{(time2 - time1) // 1000} Master read: {data}')
             return data
         except SerialException as e:
             raise MasterException('Can read from the master') from e
