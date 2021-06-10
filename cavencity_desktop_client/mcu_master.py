@@ -11,7 +11,7 @@ from mcu_master_states import MasterException, MasterSlaveTargetState, MasterSla
 
 class McuMaster:
     PORT_SPEED = 115200
-    TIMEOUT = 100
+    TIMEOUT = 1
 
     def __init__(self, port: str = None):
         super().__init__()

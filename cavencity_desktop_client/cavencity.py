@@ -17,7 +17,7 @@ sys.excepthook = exception_hook
 try:
     from PyQt5.QtWinExtras import QtWin
 
-    QtWin().setCurrentProcessExplicitAppUserModelID(id='cavensio.cavencity')
+    QtWin.setCurrentProcessExplicitAppUserModelID('cavensio.cavencity')
 except ImportError:
     pass
 

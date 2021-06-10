@@ -47,6 +47,12 @@ class CaveSlave(QGroupBox):
         self.setLayout(vbox)
 
     def update_date(self, actual_state: SlaveActualState):
+        if actual_state.online:
+            self._state_label.setText('Online')
+            self._uptime_label.setText(format_uptime(actual_state.uptime))
+        else:
+            self._state_label.setText('Offline')
+
         self._latency_label.setText(format_micros(actual_state.latency))
         self._errors_label.setText(f'{actual_state.errors}')
         self._count_lcdnumber.set_value(actual_state.counter, actual_state.online)
@@ -54,8 +60,3 @@ class CaveSlave(QGroupBox):
         self._fan_slider.set_actual_value(actual_state.fan_level)
         self._light_slider.set_actual_value(actual_state.light_level)
 
-        if actual_state.online:
-            self._state_label.setText('Online')
-            self._uptime_label.setText(format_uptime(actual_state.uptime))
-        else:
-            self._state_label.setText('Offline')

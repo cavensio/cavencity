@@ -11,7 +11,7 @@ class CaveMaster(QGroupBox):
 
     def __init__(self):
         super().__init__('Master')
-        self._state_label = QLabel('Online')
+        self._state_label = QLabel()
         self._uptime_label = QLabel()
         self._count_lcdnumber = CaveCounter()
         self._latency_label = QLabel()
@@ -28,6 +28,11 @@ class CaveMaster(QGroupBox):
         self.setLayout(form)
 
     def update_state(self, actual_state: MasterActualState):
-        self._uptime_label.setText(format_uptime(actual_state.uptime))
+        if actual_state.online:
+            self._state_label.setText('Online')
+            self._uptime_label.setText(format_uptime(actual_state.uptime))
+        else:
+            self._state_label.setText('Offline')
+
         self._count_lcdnumber.set_value(actual_state.counter)
         self._latency_label.setText(format_micros(actual_state.latency))
