@@ -2,10 +2,9 @@ from functools import partial
 
 from PyQt5.QtCore import QTimer, pyqtSlot
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QMainWindow, QMenu, QStatusBar, QLabel, QHBoxLayout, QWidget, QMessageBox
+from PyQt5.QtWidgets import QAction, QMainWindow, QMenu, QStatusBar, QLabel, QHBoxLayout, QWidget
 
 from ui.CaveMaster import CaveMaster
-from mcu_master_states import MasterException
 from model import Model
 from ui.CaveSlave import CaveSlave
 
@@ -24,13 +23,13 @@ class CaveMainWindow(QMainWindow):
         self._create_status_bar()
         self._create_master_slave_panels()
 
-        try:
-            self._model.load()
-            if self._model.master_port:
-                self._update_master_port_label()
-            self._start_thread()
-        except MasterException as e:
-            QMessageBox.warning(self, 'Master controller offline', e.message, buttons=QMessageBox.Ok)
+        # try:
+        self._model.load()
+        if self._model.master_port:
+            self._update_master_port_label()
+        self._start_thread()
+        # except MasterException as e:
+        #     QMessageBox.warning(self, 'Master controller offline', e.message, buttons=QMessageBox.Ok)
 
     def _create_com_port_menu(self):
         self.com_port_menu = QMenu('&Master port', self)

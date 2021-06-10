@@ -6,7 +6,7 @@ from logger import log
 from serial import Serial, SerialException
 from serial.tools import list_ports
 
-from mcu_master_states import MasterException, MasterSlaveTargetState, MasterSlaveActualState
+from mcu.mcu_master_states import MasterException, MasterSlaveTargetState, MasterSlaveActualState
 
 
 class McuMaster:
@@ -107,7 +107,7 @@ class McuMaster:
     def port(self, port):
         log.info(f'Set master port: {port}')
         self._port = port
-        self._check_or_open_serial(True)
+        # self._check_or_open_serial(True)
 
     def list_ports(self):
         """

@@ -3,8 +3,8 @@ import configparser as configparser
 from logger import log
 from serial.tools.list_ports_common import ListPortInfo
 
-from mcu_master import McuMaster
-from mcu_master_states import MasterSlaveTargetState, MasterSlaveActualState
+from mcu.mcu_master import McuMaster
+from mcu.mcu_master_states import MasterSlaveTargetState, MasterSlaveActualState, MasterException
 
 
 class Model:
@@ -51,4 +51,8 @@ class Model:
         return self._master.list_ports()
 
     def tick(self):
-        self.actual_state = self._master.set_state(self.target_state)
+        log.info('tick')
+        try:
+            self.actual_state = self._master.set_state(self.target_state)
+        except MasterException as e:
+            self.actual_state = MasterSlaveActualState()

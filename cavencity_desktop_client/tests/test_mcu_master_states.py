@@ -1,6 +1,6 @@
 import unittest
 
-from mcu_master_states import MasterSlaveTargetState, MasterSlaveActualState
+from mcu.mcu_master_states import MasterSlaveTargetState, MasterSlaveActualState
 
 
 class TestMasterSlaveTargetState(unittest.TestCase):

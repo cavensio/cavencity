@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QFormLayout, QGroupBox, QCheckBox, QVBoxLayout
 
-from mcu_master_states import SlaveActualState
+from mcu.mcu_master_states import SlaveActualState
 from ui.CaveCounter import CaveCounter
 from ui.CaveSlider import CaveSlider
 from ui.ui_utils import format_uptime, format_micros

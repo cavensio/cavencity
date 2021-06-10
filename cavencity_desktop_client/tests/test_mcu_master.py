@@ -1,7 +1,7 @@
 import unittest
 
-from mcu_master import McuMaster
-from mcu_master_states import MasterException
+from mcu.mcu_master import McuMaster
+from mcu.mcu_master_states import MasterException
 
 MASTER_PORT = 'COM3'
 
