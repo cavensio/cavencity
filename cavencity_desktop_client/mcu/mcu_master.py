@@ -24,6 +24,7 @@ class McuMaster:
         self._serial_write(b'S ' + request + b'\n')
         state: MasterSlaveActualState = self._read_state()
         time2 = time.time_ns()
+        state.masterState.online = True
         state.masterState.latency = (time2 - time1) // 1000
         return state
 
@@ -88,7 +89,9 @@ class McuMaster:
             log.info(f'Master write: {data}')
             self._serial.write(data)
         except SerialException as e:
-            raise MasterException('Can write to the master') from e
+            msg = f'Can write to the master {self._port}'
+            log.warning(msg)
+            raise MasterException(msg) from e
 
     def _serial_readline(self) -> bytes:
         self._check_or_open_serial()
@@ -97,7 +100,9 @@ class McuMaster:
             log.info(f'Master read: {data}')
             return data
         except SerialException as e:
-            raise MasterException('Can read from the master') from e
+            msg = f'Can read from the master {self._port}'
+            log.warning(msg)
+            raise MasterException(msg) from e
 
     @property
     def port(self):
@@ -115,4 +120,5 @@ class McuMaster:
         :return: ordered list of ListPortInfo objects
         """
         # return [ListPortInfo(f'COM{n}') for n in range(1, 5)]
+        log.info('List COM ports')
         return sorted(list_ports.comports())
